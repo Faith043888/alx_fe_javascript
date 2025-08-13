@@ -147,8 +147,8 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-// Simulate server sync
-async function fetchServerQuotes() {
+// ALX-compliant: fetchQuotesFromServer
+async function fetchQuotesFromServer() {
   try {
     const response = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=5");
     const serverData = await response.json();
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
   importInput.addEventListener("change", importFromJsonFile);
 
   // Initial server sync
-  fetchServerQuotes();
+  fetchQuotesFromServer();
 });
 
 // Event listeners
@@ -217,7 +217,8 @@ newQuoteBtn.addEventListener("click", showRandomQuote);
 categoryFilter.addEventListener("change", filterQuotes);
 
 // Periodic server sync every 30 seconds
-setInterval(fetchServerQuotes, 30000);
+setInterval(fetchQuotesFromServer, 30000);
+
 
 
 

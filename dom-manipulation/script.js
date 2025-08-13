@@ -8,6 +8,7 @@ let quotes = JSON.parse(localStorage.getItem("quotes")) || [
 // DOM elements
 const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteBtn = document.getElementById("newQuote");
+const addQuoteContainer = document.getElementById("addQuoteContainer");
 
 // Save quotes to local storage
 function saveQuotes() {
@@ -68,21 +69,7 @@ function createAddQuoteForm() {
   formContainer.appendChild(categoryInput);
   formContainer.appendChild(addButton);
 
-  document.body.appendChild(formContainer);
-
-  // Export button
-  const exportBtn = document.createElement("button");
-  exportBtn.textContent = "Export Quotes (JSON)";
-  exportBtn.addEventListener("click", exportToJsonFile);
-  document.body.appendChild(exportBtn);
-
-  // Import input
-  const importInput = document.createElement("input");
-  importInput.type = "file";
-  importInput.id = "importFile";
-  importInput.accept = ".json";
-  importInput.addEventListener("change", importFromJsonFile);
-  document.body.appendChild(importInput);
+  addQuoteContainer.appendChild(formContainer);
 }
 
 // Export quotes as JSON
@@ -118,16 +105,25 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-// Load last viewed quote if available
+// Initialize page
 document.addEventListener("DOMContentLoaded", () => {
   createAddQuoteForm();
 
+  // Load last viewed quote if available
   const lastQuote = sessionStorage.getItem("lastQuote");
   if (lastQuote) {
     const { text, category } = JSON.parse(lastQuote);
     quoteDisplay.innerHTML = `<strong>${text}</strong> <br><em>— ${category}</em>`;
   }
+
+  // Connect Export/Import buttons from static HTML
+  const exportBtn = document.getElementById("exportBtn");
+  exportBtn.addEventListener("click", exportToJsonFile);
+
+  const importInput = document.getElementById("importFile");
+  importInput.addEventListener("change", importFromJsonFile);
 });
 
 // Event listener for showing new quotes
 newQuoteBtn.addEventListener("click", showRandomQuote);
+

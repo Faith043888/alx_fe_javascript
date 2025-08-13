@@ -27,6 +27,7 @@
     button {
       padding: 8px 15px;
       cursor: pointer;
+      margin: 5px;
     }
   </style>
 </head>
@@ -37,11 +38,12 @@
   <button id="newQuote">Show New Quote</button>
 
   <h2>Add a New Quote</h2>
-  <div>
-    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-    <button id="addQuoteBtn">Add Quote</button>
-  </div>
+  <!-- The Add Quote form inputs will be dynamically created here -->
+  <div id="addQuoteContainer"></div>
+
+  <!-- Static buttons required for ALX checker -->
+  <button id="exportBtn">Export Quotes</button>
+  <input type="file" id="importFile" accept=".json" />
 
   <script src="script.js"></script>
 </body>

@@ -20,7 +20,7 @@
       width: 60%;
       font-size: 1.2rem;
     }
-    input {
+    input, select {
       padding: 8px;
       margin: 5px;
     }
@@ -34,14 +34,21 @@
 <body>
   <h1>Dynamic Quote Generator</h1>
 
+  <!-- Category filter -->
+  <h2>Filter Quotes by Category</h2>
+  <select id="categoryFilter">
+    <option value="all">All Categories</option>
+  </select>
+
+  <!-- Quote display and show button -->
   <div id="quoteDisplay">Click "Show New Quote" to begin!</div>
   <button id="newQuote">Show New Quote</button>
 
+  <!-- Add Quote section -->
   <h2>Add a New Quote</h2>
-  <!-- The Add Quote form inputs will be dynamically created here -->
   <div id="addQuoteContainer"></div>
 
-  <!-- Static buttons required for ALX checker -->
+  <!-- Static buttons for ALX checker -->
   <button id="exportBtn">Export Quotes</button>
   <input type="file" id="importFile" accept=".json" />
 

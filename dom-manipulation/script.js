@@ -9,20 +9,29 @@ let quotes = JSON.parse(localStorage.getItem("quotes")) || [
 const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteBtn = document.getElementById("newQuote");
 const addQuoteContainer = document.getElementById("addQuoteContainer");
+const categoryFilter = document.getElementById("categoryFilter");
 
 // Save quotes to local storage
 function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
 }
 
-// Show random quote
+// Show random quote (respects filter)
 function showRandomQuote() {
-  if (quotes.length === 0) {
-    quoteDisplay.innerHTML = "No quotes available. Please add some!";
+  const selectedCategory = categoryFilter.value;
+  let filteredQuotes = quotes;
+
+  if (selectedCategory !== "all") {
+    filteredQuotes = quotes.filter(q => q.category === selectedCategory);
+  }
+
+  if (filteredQuotes.length === 0) {
+    quoteDisplay.innerHTML = "No quotes available in this category.";
     return;
   }
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  const { text, category } = quotes[randomIndex];
+
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const { text, category } = filteredQuotes[randomIndex];
   quoteDisplay.innerHTML = `<strong>${text}</strong> <br><em>— ${category}</em>`;
 
   // Save last viewed quote to session storage
@@ -41,6 +50,7 @@ function addQuote() {
 
   quotes.push({ text, category });
   saveQuotes();
+  populateCategories(); // update categories if new
 
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
@@ -72,6 +82,35 @@ function createAddQuoteForm() {
   addQuoteContainer.appendChild(formContainer);
 }
 
+// Populate category dropdown dynamically
+function populateCategories() {
+  // Save last selected category
+  const lastSelected = categoryFilter.value || "all";
+
+  // Get unique categories
+  const categories = Array.from(new Set(quotes.map(q => q.category)));
+  
+  // Clear dropdown except "all"
+  categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+  categories.forEach(cat => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    categoryFilter.appendChild(option);
+  });
+
+  // Restore last selected category
+  categoryFilter.value = lastSelected;
+  localStorage.setItem("lastCategory", lastSelected);
+}
+
+// Filter quotes based on dropdown
+function filterQuotes() {
+  localStorage.setItem("lastCategory", categoryFilter.value);
+  showRandomQuote();
+}
+
 // Export quotes as JSON
 function exportToJsonFile() {
   const dataStr = JSON.stringify(quotes, null, 2);
@@ -94,6 +133,7 @@ function importFromJsonFile(event) {
       if (Array.isArray(importedQuotes)) {
         quotes.push(...importedQuotes);
         saveQuotes();
+        populateCategories();
         alert("Quotes imported successfully!");
       } else {
         alert("Invalid JSON format.");
@@ -108,6 +148,7 @@ function importFromJsonFile(event) {
 // Initialize page
 document.addEventListener("DOMContentLoaded", () => {
   createAddQuoteForm();
+  populateCategories();
 
   // Load last viewed quote if available
   const lastQuote = sessionStorage.getItem("lastQuote");
@@ -115,6 +156,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const { text, category } = JSON.parse(lastQuote);
     quoteDisplay.innerHTML = `<strong>${text}</strong> <br><em>— ${category}</em>`;
   }
+
+  // Restore last selected filter
+  const lastCategory = localStorage.getItem("lastCategory") || "all";
+  categoryFilter.value = lastCategory;
 
   // Connect Export/Import buttons from static HTML
   const exportBtn = document.getElementById("exportBtn");
@@ -124,6 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
   importInput.addEventListener("change", importFromJsonFile);
 });
 
-// Event listener for showing new quotes
+// Event listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
+categoryFilter.addEventListener("change", filterQuotes);
+
 

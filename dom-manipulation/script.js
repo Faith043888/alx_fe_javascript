@@ -11,7 +11,7 @@ const newQuoteBtn = document.getElementById("newQuote");
 const addQuoteContainer = document.getElementById("addQuoteContainer");
 const categoryFilter = document.getElementById("categoryFilter");
 
-// Add sync status div above quote display
+// Sync status div
 const syncStatus = document.createElement("div");
 syncStatus.id = "syncStatus";
 syncStatus.style.color = "green";
@@ -23,7 +23,7 @@ function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
 }
 
-// Show random quote (respects filter)
+// Show random quote (filtered)
 function showRandomQuote() {
   const selectedCategory = categoryFilter.value;
   let filteredQuotes = quotes;
@@ -41,7 +41,6 @@ function showRandomQuote() {
   const { text, category } = filteredQuotes[randomIndex];
   quoteDisplay.innerHTML = `<strong>${text}</strong> <br><em>— ${category}</em>`;
 
-  // Save last viewed quote to session storage
   sessionStorage.setItem("lastQuote", JSON.stringify({ text, category }));
 }
 
@@ -55,16 +54,19 @@ function addQuote() {
     return;
   }
 
-  quotes.push({ text, category });
+  const newQuote = { text, category };
+  quotes.push(newQuote);
   saveQuotes();
-  populateCategories(); // update categories if new
-
+  populateCategories();
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
   alert("Quote added successfully!");
+
+  // Post the new quote to mock server
+  postQuoteToServer(newQuote);
 }
 
-// Create the Add Quote form dynamically
+// Dynamically create Add Quote form
 function createAddQuoteForm() {
   const formContainer = document.createElement("div");
 
@@ -107,7 +109,7 @@ function populateCategories() {
   localStorage.setItem("lastCategory", lastSelected);
 }
 
-// Filter quotes based on dropdown
+// Filter quotes by selected category
 function filterQuotes() {
   localStorage.setItem("lastCategory", categoryFilter.value);
   showRandomQuote();
@@ -147,8 +149,22 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-// ALX-compliant: fetchQuotesFromServer
-async function fetchQuotesFromServer() {
+// Post a new quote to mock server
+async function postQuoteToServer(quote) {
+  try {
+    await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quote)
+    });
+    // We don't expect a real server response; just simulate
+  } catch (err) {
+    console.error("Error posting quote to server:", err);
+  }
+}
+
+// ALX-compliant syncQuotes function
+async function syncQuotes() {
   try {
     const response = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=5");
     const serverData = await response.json();
@@ -179,12 +195,12 @@ async function fetchQuotesFromServer() {
 
     if (conflictsResolved || newQuotes) {
       syncStatus.textContent = `Sync complete: ${newQuotes} new quotes, ${conflictsResolved} conflicts resolved.`;
-      setTimeout(() => syncStatus.textContent = "", 5000);
+      setTimeout(() => (syncStatus.textContent = ""), 5000);
     }
   } catch (err) {
-    console.error("Error syncing with server:", err);
+    console.error("Error syncing quotes:", err);
     syncStatus.textContent = "Error syncing with server";
-    setTimeout(() => syncStatus.textContent = "", 5000);
+    setTimeout(() => (syncStatus.textContent = ""), 5000);
   }
 }
 
@@ -208,17 +224,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const importInput = document.getElementById("importFile");
   importInput.addEventListener("change", importFromJsonFile);
 
-  // Initial server sync
-  fetchQuotesFromServer();
+  // Initial sync
+  syncQuotes();
 });
 
 // Event listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
 categoryFilter.addEventListener("change", filterQuotes);
 
-// Periodic server sync every 30 seconds
-setInterval(fetchQuotesFromServer, 30000);
-
-
-
-
+// Periodic sync every 30 seconds
+setInterval(syncQuotes, 30000);

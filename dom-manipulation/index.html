@@ -11,6 +11,10 @@
       background: #f4f4f4;
       padding: 20px;
     }
+    #syncStatus {
+      color: green;
+      margin-bottom: 10px;
+    }
     #quoteDisplay {
       margin: 20px auto;
       padding: 15px;
@@ -34,6 +38,9 @@
 <body>
   <h1>Dynamic Quote Generator</h1>
 
+  <!-- Sync status -->
+  <div id="syncStatus"></div>
+
   <!-- Category filter -->
   <h2>Filter Quotes by Category</h2>
   <select id="categoryFilter">
@@ -55,3 +62,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
